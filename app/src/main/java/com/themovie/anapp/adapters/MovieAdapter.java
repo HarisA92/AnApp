@@ -38,7 +38,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder>{
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final Result movieList = list.get(position);
-        Glide.with(context).load("https://image.tmdb.org/t/p/w500/" + movieList.getPosterPath())
+        Glide.with(context).load(context.getResources().getString(R.string.imagePath) + movieList.getPosterPath())
                 .apply(RequestOptions.circleCropTransform())
                 .into(holder.image);
         holder.title.setText(movieList.getTitle());
@@ -46,9 +46,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder>{
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), HolderActivity.class);
-                intent.putExtra("position", movieList.getTitle());
-                intent.putExtra("position2", movieList.getOverview());
-                intent.putExtra("position3", movieList.getBackdropPath());
+                intent.putExtra(context.getResources().getString(R.string.title), movieList.getTitle());
+                intent.putExtra(context.getResources().getString(R.string.overview), movieList.getOverview());
+                intent.putExtra(context.getResources().getString(R.string.backdropPath), movieList.getBackdropPath());
                 view.getContext().startActivity(intent);
             }
         });

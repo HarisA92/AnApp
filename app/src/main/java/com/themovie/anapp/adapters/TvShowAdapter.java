@@ -18,7 +18,7 @@ import com.themovie.anapp.retrofit.model.modelTvShow.Result;
 
 import java.util.List;
 
-public class TvShowAdapter extends RecyclerView.Adapter<TvShowAdapter.ViewHolder>{
+public class TvShowAdapter extends RecyclerView.Adapter<TvShowAdapter.ViewHolder> {
 
     private List<Result> list;
     private Context context;
@@ -39,16 +39,16 @@ public class TvShowAdapter extends RecyclerView.Adapter<TvShowAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final Result result = list.get(position);
         holder.title.setText(result.getName());
-        Glide.with(context).load("https://image.tmdb.org/t/p/w500/" + result.getPosterPath())
+        Glide.with(context).load(context.getResources().getString(R.string.imagePath) + result.getPosterPath())
                 .apply(RequestOptions.circleCropTransform())
                 .into(holder.image);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), HolderActivity.class);
-                intent.putExtra("position", result.getName());
-                intent.putExtra("position2", result.getOverview());
-                intent.putExtra("position3", result.getBackdropPath());
+                intent.putExtra(context.getResources().getString(R.string.title), result.getName());
+                intent.putExtra(context.getResources().getString(R.string.overview), result.getOverview());
+                intent.putExtra(context.getResources().getString(R.string.backdropPath), result.getBackdropPath());
                 view.getContext().startActivity(intent);
             }
         });
