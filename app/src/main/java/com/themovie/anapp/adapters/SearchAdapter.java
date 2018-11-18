@@ -26,6 +26,8 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
     private Context context;
     private List<Result> list;
     private List<Result> exampleListFull;
+    private boolean isLoadingAdded = false;
+
 
     public SearchAdapter(Context context, List<Result> list) {
         this.context = context;
@@ -68,7 +70,6 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             List<Result> filteredList = new ArrayList<>();
-
             if (constraint == null || constraint.length() == 0) {
                 filteredList.addAll(exampleListFull);
             } else {

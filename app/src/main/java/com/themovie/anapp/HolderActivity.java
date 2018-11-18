@@ -20,6 +20,10 @@ public class HolderActivity extends AppCompatActivity {
         TextView overview = findViewById(R.id.text_overview);
         ImageView image = findViewById(R.id.image_poster);
 
+        if(getSupportActionBar() != null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
         String titleMovie = getIntent().getStringExtra(getResources().getString(R.string.title));
         String imageMovie = getIntent().getStringExtra(getResources().getString(R.string.backdropPath));
         String overviewMovie = getIntent().getStringExtra(getResources().getString(R.string.overview));
@@ -27,7 +31,16 @@ public class HolderActivity extends AppCompatActivity {
         title.setText(titleMovie);
         overview.setText(overviewMovie);
         Glide.with(this).load("https://image.tmdb.org/t/p/w500/" + imageMovie).into(image);
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch(item.getItemId()){
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }

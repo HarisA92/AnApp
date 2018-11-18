@@ -23,7 +23,7 @@ public class TvShowAdapter extends RecyclerView.Adapter<TvShowAdapter.ViewHolder
     private List<Result> list;
     private Context context;
 
-    public TvShowAdapter(List<Result> list, Context context) {
+    public TvShowAdapter(Context context, List<Result> list) {
         this.list = list;
         this.context = context;
     }

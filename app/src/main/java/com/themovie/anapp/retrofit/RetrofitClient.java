@@ -5,21 +5,23 @@ import com.themovie.anapp.retrofit.model.modelTvShow.TopRatedTvShows;
 
 import io.reactivex.Observable;
 import retrofit2.http.GET;
-import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface RetrofitClient {
 
-    @GET("/3/movie/{category}")
-    Observable<TopRatedMovies> getMovies(@Path("category") String category,
-                                         @Query("api_key") String api_key,
+    @GET("/3/movie/top_rated")
+    Observable<TopRatedMovies> getMovies(@Query("api_key") String api_key,
                                          @Query("q") String language,
                                          @Query("page") int page);
 
-    @GET("/3/tv/{category}")
-    Observable<TopRatedTvShows> getTvShows(@Path("category") String category,
-                                           @Query("api_key") String api_key,
+    @GET("/3/tv/top_rated")
+    Observable<TopRatedTvShows> getTvShows(@Query("api_key") String api_key,
                                            @Query("q") String language,
                                            @Query("page") int page);
+
+    @GET("/3/search/movie")
+    Observable<TopRatedMovies> getSearchedMovies(@Query("api_key") String api_key,
+                                                 @Query("q") String language,
+                                                 @Query("query") String query);
 
 }

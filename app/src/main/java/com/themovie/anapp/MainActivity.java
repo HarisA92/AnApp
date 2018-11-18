@@ -15,6 +15,8 @@ import com.themovie.anapp.fragments.TvShowFragment;
 
 public class MainActivity extends AppCompatActivity implements MovieFragment.OnFragmentInteractionListener, TvShowFragment.OnFragmentInteractionListener {
 
+    private String getTabNumber;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,13 +32,16 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.OnF
         tabLayout.setTabMode(TabLayout.GRAVITY_FILL);
         tabLayout.setTabMode(TabLayout.MODE_FIXED);
 
+
         TabLayoutAdapter adapter = new TabLayoutAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(adapter);
-        viewPager.setOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
+                int position = tab.getPosition();
+                getTabNumber = String.valueOf(position);
             }
 
             @Override
@@ -71,8 +76,21 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.OnF
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_search:
-                Intent intent = new Intent(MainActivity.this, SearchActivity.class);
-                startActivity(intent);
+                if(getTabNumber == null){
+                    Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+                    intent.putExtra("Movies", getTabNumber);
+                    startActivity(intent);
+                    if(getTabNumber.equals("0")){
+                        Intent newIntent = new Intent(MainActivity.this, SearchActivity.class);
+                        newIntent.putExtra("Movies", getTabNumber);
+                        startActivity(newIntent);
+                    }
+                }else {
+                    Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+                    intent.putExtra("TvShows", getTabNumber);
+                    startActivity(intent);
+                }
+
             default:
                 return super.onOptionsItemSelected(item);
         }
