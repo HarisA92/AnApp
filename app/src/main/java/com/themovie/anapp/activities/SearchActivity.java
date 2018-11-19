@@ -181,7 +181,7 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextChange(String s) {
                 if (getMovieTab != null && getTvShowTab == null) {
-                    if (s.length() > 3) {
+                    if (s.length() >= 3) {
                         setUpSearchMovies(s);
                         try {
                             searchMovieAdapter.getFilter().filter(s);
@@ -189,7 +189,7 @@ public class SearchActivity extends AppCompatActivity {
                         }
                     }
                 } else if (getMovieTab == null && getTvShowTab != null) {
-                    if (s.length() > 3) {
+                    if (s.length() >= 3) {
                         setUpSearchTvShows(s);
                         try {
                             searchTvShowAdapter.getFilter().filter(s);
