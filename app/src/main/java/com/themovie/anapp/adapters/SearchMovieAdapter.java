@@ -14,12 +14,15 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.squareup.picasso.Picasso;
 import com.themovie.anapp.R;
 import com.themovie.anapp.activities.HolderActivity;
 import com.themovie.anapp.retrofit.model.modelMovie.Result;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 
 public class SearchMovieAdapter extends RecyclerView.Adapter<SearchMovieAdapter.ViewHolder> implements Filterable {
 
