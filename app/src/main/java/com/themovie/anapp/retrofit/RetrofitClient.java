@@ -24,4 +24,9 @@ public interface RetrofitClient {
                                                  @Query("q") String language,
                                                  @Query("query") String query);
 
+    @GET("/3/search/tv")
+    Observable<TopRatedTvShows> getSearchedTvShows(@Query("api_key") String api_key,
+                                                   @Query("q") String language,
+                                                   @Query("query") String query);
+
 }

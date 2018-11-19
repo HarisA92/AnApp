@@ -14,36 +14,62 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.themovie.anapp.HolderActivity;
 import com.themovie.anapp.R;
+import com.themovie.anapp.activities.HolderActivity;
 import com.themovie.anapp.retrofit.model.modelMovie.Result;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder> implements Filterable {
+public class SearchMovieAdapter extends RecyclerView.Adapter<SearchMovieAdapter.ViewHolder> implements Filterable {
 
     private Context context;
     private List<Result> list;
-    private List<Result> exampleListFull;
-    private boolean isLoadingAdded = false;
+    private List<Result> copyList;
 
+    private Filter filter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            List<Result> filteredList = new ArrayList<>();
+            if (constraint == null || constraint.length() == 0) {
+                filteredList.addAll(copyList);
+            } else {
+                String filterPattern = constraint.toString();
+                for (Result result : copyList) {
+                    if (result.getTitle().contains(filterPattern)) {
+                        filteredList.add(result);
+                    }
+                }
+            }
+            FilterResults results = new FilterResults();
+            results.values = filteredList;
 
-    public SearchAdapter(Context context, List<Result> list) {
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            list.clear();
+            list.addAll((List) results.values);
+            notifyDataSetChanged();
+        }
+    };
+
+    public SearchMovieAdapter(Context context, List<Result> list) {
         this.context = context;
         this.list = list;
-        exampleListFull = new ArrayList<>(list);
+        copyList = new ArrayList<>(list);
     }
 
     @NonNull
     @Override
-    public SearchAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+    public SearchMovieAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.movies_tvshows_adapter, viewGroup, false);
-        return new SearchAdapter.ViewHolder(v);
+        return new SearchMovieAdapter.ViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull SearchAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull SearchMovieAdapter.ViewHolder holder, int position) {
         final Result result = list.get(position);
         holder.title.setText(result.getTitle());
         Glide.with(context).load(context.getResources().getString(R.string.imagePath) + result.getPosterPath())
@@ -66,37 +92,9 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         return list.size();
     }
 
-    private Filter exampleFilter = new Filter() {
-        @Override
-        protected FilterResults performFiltering(CharSequence constraint) {
-            List<Result> filteredList = new ArrayList<>();
-            if (constraint == null || constraint.length() == 0) {
-                filteredList.addAll(exampleListFull);
-            } else {
-                String filterPattern = constraint.toString();
-                for (Result result : exampleListFull) {
-                    if (result.getTitle().contains(filterPattern)) {
-                        filteredList.add(result);
-                    }
-                }
-            }
-            FilterResults results = new FilterResults();
-            results.values = filteredList;
-
-            return results;
-        }
-
-        @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
-            list.clear();
-            list.addAll((List) results.values);
-            notifyDataSetChanged();
-        }
-    };
-
     @Override
     public Filter getFilter() {
-        return exampleFilter;
+        return filter;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

@@ -12,13 +12,13 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.themovie.anapp.HolderActivity;
 import com.themovie.anapp.R;
+import com.themovie.anapp.activities.HolderActivity;
 import com.themovie.anapp.retrofit.model.modelMovie.Result;
 
 import java.util.List;
 
-public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder>{
+public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
 
     private Context context;
     private List<Result> list;

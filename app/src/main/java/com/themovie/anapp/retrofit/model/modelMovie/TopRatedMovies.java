@@ -8,8 +8,6 @@ import java.util.List;
 
 public class TopRatedMovies {
 
-    private ArrayList<Result> resultList = new ArrayList<>();
-
     @SerializedName("page")
     @Expose
     private Integer page;

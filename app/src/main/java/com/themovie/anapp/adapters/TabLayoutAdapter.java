@@ -11,7 +11,7 @@ public class TabLayoutAdapter extends FragmentStatePagerAdapter {
 
     private int numberOfTabs;
 
-    public TabLayoutAdapter( final FragmentManager fm, int numberOfTabs) {
+    public TabLayoutAdapter(final FragmentManager fm, int numberOfTabs) {
         super(fm);
         this.numberOfTabs = numberOfTabs;
     }

@@ -1,14 +1,13 @@
-package com.themovie.anapp;
+package com.themovie.anapp.activities;
 
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
-import android.view.MenuItem;
 
+import com.themovie.anapp.R;
 import com.themovie.anapp.adapters.TabLayoutAdapter;
 import com.themovie.anapp.fragments.MovieFragment;
 import com.themovie.anapp.fragments.TvShowFragment;
@@ -40,8 +39,6 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.OnF
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
-                int position = tab.getPosition();
-                getTabNumber = String.valueOf(position);
             }
 
             @Override
@@ -70,29 +67,5 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.OnF
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_item_search, menu);
         return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_item_search:
-                if(getTabNumber == null){
-                    Intent intent = new Intent(MainActivity.this, SearchActivity.class);
-                    intent.putExtra("Movies", getTabNumber);
-                    startActivity(intent);
-                    if(getTabNumber.equals("0")){
-                        Intent newIntent = new Intent(MainActivity.this, SearchActivity.class);
-                        newIntent.putExtra("Movies", getTabNumber);
-                        startActivity(newIntent);
-                    }
-                }else {
-                    Intent intent = new Intent(MainActivity.this, SearchActivity.class);
-                    intent.putExtra("TvShows", getTabNumber);
-                    startActivity(intent);
-                }
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 }

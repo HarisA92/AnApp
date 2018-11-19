@@ -7,6 +7,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,27 +18,59 @@ import com.themovie.anapp.R;
 import com.themovie.anapp.activities.HolderActivity;
 import com.themovie.anapp.retrofit.model.modelTvShow.Result;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class TvShowAdapter extends RecyclerView.Adapter<TvShowAdapter.ViewHolder> {
+public class SearchTvShowAdapter extends RecyclerView.Adapter<SearchTvShowAdapter.ViewHolder> implements Filterable {
 
-    private List<Result> list;
     private Context context;
+    private List<Result> list;
+    private List<Result> copyList;
 
-    public TvShowAdapter(Context context, List<Result> list) {
-        this.list = list;
+    private Filter filter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            List<Result> filteredList = new ArrayList<>();
+            if (constraint == null || constraint.length() == 0) {
+                filteredList.addAll(copyList);
+            } else {
+                String filterPattern = constraint.toString();
+                for (Result result : copyList) {
+                    if (result.getName().contains(filterPattern)) {
+                        filteredList.add(result);
+                    }
+                }
+            }
+
+            FilterResults results = new FilterResults();
+            results.values = filteredList;
+
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            list.clear();
+            list.addAll((List) results.values);
+            notifyDataSetChanged();
+        }
+    };
+
+    public SearchTvShowAdapter(Context context, List<Result> list) {
         this.context = context;
+        this.list = list;
+        copyList = new ArrayList<>(list);
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View v = LayoutInflater.from(context).inflate(R.layout.movies_tvshows_adapter, viewGroup, false);
-        return new TvShowAdapter.ViewHolder(v);
+    public SearchTvShowAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.movies_tvshows_adapter, viewGroup, false);
+        return new SearchTvShowAdapter.ViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull SearchTvShowAdapter.ViewHolder holder, int position) {
         final Result result = list.get(position);
         holder.title.setText(result.getName());
         Glide.with(context).load(context.getResources().getString(R.string.imagePath) + result.getPosterPath())
@@ -57,6 +91,11 @@ public class TvShowAdapter extends RecyclerView.Adapter<TvShowAdapter.ViewHolder
     @Override
     public int getItemCount() {
         return list.size();
+    }
+
+    @Override
+    public Filter getFilter() {
+        return filter;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
