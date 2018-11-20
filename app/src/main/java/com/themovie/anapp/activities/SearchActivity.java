@@ -15,8 +15,6 @@ import android.widget.Toast;
 import com.themovie.anapp.BuildConfig;
 import com.themovie.anapp.R;
 import com.themovie.anapp.adapters.MovieAdapter;
-import com.themovie.anapp.adapters.SearchMovieAdapter;
-import com.themovie.anapp.adapters.SearchTvShowAdapter;
 import com.themovie.anapp.adapters.TvShowAdapter;
 import com.themovie.anapp.retrofit.ModelClient;
 import com.themovie.anapp.retrofit.RetrofitClient;
@@ -34,13 +32,11 @@ import io.reactivex.schedulers.Schedulers;
 
 public class SearchActivity extends AppCompatActivity {
 
-    String getMovieTab, getTvShowTab;
+    private String getMovieTab, getTvShowTab;
     private List<Result> listMovies;
     private List<com.themovie.anapp.retrofit.model.modelTvShow.Result> listTvShow;
     private MovieAdapter movieAdapter;
     private TvShowAdapter tvShowAdapter;
-    private SearchMovieAdapter searchMovieAdapter;
-    private SearchTvShowAdapter searchTvShowAdapter;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     private RecyclerView recyclerView;
     private RetrofitClient client = ModelClient.retrofitclient();
@@ -58,14 +54,74 @@ public class SearchActivity extends AppCompatActivity {
         getMovieTab = getIntent().getStringExtra(getResources().getString(R.string.movie_holder));
         getTvShowTab = getIntent().getStringExtra(getResources().getString(R.string.tvshow_holder));
         setUpSearchActivity();
-
     }
 
-    private void setUpSearchActivity() {
-        if (getMovieTab != null && getTvShowTab == null) {
-            setUpTop10Movies();
-        } else {
-            setUpTop10TvShows();
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.search_menu, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        searchView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                if (isMoviesTabSelected()) {
+                    if (s.length() >= 3) {
+                        setUpSearchMovies(s);
+                        return true;
+                    }
+                } else {
+                    if (s.length() >= 3) {
+                        setUpSearchTvShows(s);
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                if (isMoviesTabSelected()) {
+                    setUpTop10Movies();
+                } else {
+                    setUpTop10TvShows();
+                }
+                return true;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (compositeDisposable != null && !compositeDisposable.isDisposed()) {
+            compositeDisposable.dispose();
         }
     }
 
@@ -125,8 +181,8 @@ public class SearchActivity extends AppCompatActivity {
                     @Override
                     public void accept(TopRatedMovies topRatedMovies) {
                         listMovies = topRatedMovies.getResults();
-                        searchMovieAdapter = new SearchMovieAdapter(getApplicationContext(), listMovies);
-                        recyclerView.setAdapter(searchMovieAdapter);
+                        movieAdapter = new MovieAdapter(getApplicationContext(), listMovies);
+                        recyclerView.setAdapter(movieAdapter);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -144,8 +200,8 @@ public class SearchActivity extends AppCompatActivity {
                     @Override
                     public void accept(TopRatedTvShows topRatedTvShows) {
                         listTvShow = topRatedTvShows.getResults();
-                        searchTvShowAdapter = new SearchTvShowAdapter(getApplicationContext(), listTvShow);
-                        recyclerView.setAdapter(searchTvShowAdapter);
+                        tvShowAdapter = new TvShowAdapter(getApplicationContext(), listTvShow);
+                        recyclerView.setAdapter(tvShowAdapter);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -162,78 +218,16 @@ public class SearchActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.search_menu, menu);
-
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) searchItem.getActionView();
-        searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        searchView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                if (getMovieTab != null && getTvShowTab == null) {
-                    if (s.length() >= 3) {
-                        setUpSearchMovies(s);
-                        try {
-                            searchMovieAdapter.getFilter().filter(s);
-                        } catch (Exception ignored) {
-                        }
-                    }
-                } else if (getMovieTab == null && getTvShowTab != null) {
-                    if (s.length() >= 3) {
-                        setUpSearchTvShows(s);
-                        try {
-                            searchTvShowAdapter.getFilter().filter(s);
-                        } catch (Exception ignored) {
-                        }
-                    }
-                }
-                return false;
-            }
-        });
-        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
-            @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
-                return true;
-            }
-
-            @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                if (getMovieTab != null && getTvShowTab == null) {
-                    setUpTop10Movies();
-                } else {
-                    setUpTop10TvShows();
-                }
-                return true;
-            }
-        });
-        return super.onCreateOptionsMenu(menu);
+    private boolean isMoviesTabSelected() {
+        return getMovieTab != null && getTvShowTab == null;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (compositeDisposable != null && !compositeDisposable.isDisposed()) {
-            compositeDisposable.dispose();
+    private void setUpSearchActivity() {
+        if (isMoviesTabSelected()) {
+            setUpTop10Movies();
+        } else {
+            setUpTop10TvShows();
         }
     }
+
 }

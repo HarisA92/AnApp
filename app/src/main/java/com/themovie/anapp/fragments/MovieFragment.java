@@ -1,7 +1,6 @@
 package com.themovie.anapp.fragments;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -59,13 +58,6 @@ public class MovieFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private void buildRecyclerView(View v) {
-        recyclerView = v.findViewById(R.id.recycler_view_movies);
-        recyclerView.setHasFixedSize(true);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(layoutManager);
-    }
-
     private void setUpTop10() {
         compositeDisposable.add(client.getMovies(BuildConfig.ApiKey, getResources().getString(R.string.language), 1)
                 .subscribeOn(Schedulers.io())
@@ -90,7 +82,10 @@ public class MovieFragment extends Fragment {
                 }));
     }
 
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
+    private void buildRecyclerView(View v) {
+        recyclerView = v.findViewById(R.id.recycler_view_movies);
+        recyclerView.setHasFixedSize(true);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(layoutManager);
     }
 }

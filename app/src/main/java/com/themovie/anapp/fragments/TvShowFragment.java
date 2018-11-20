@@ -86,12 +86,7 @@ public class TvShowFragment extends Fragment {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
                         Toast.makeText(getActivity(), getResources().getString(R.string.error) + throwable.getMessage(), Toast.LENGTH_SHORT).show();
-
                     }
                 }));
-    }
-
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
     }
 }

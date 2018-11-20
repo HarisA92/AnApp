@@ -1,6 +1,5 @@
 package com.themovie.anapp.activities;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -9,12 +8,8 @@ import android.view.Menu;
 
 import com.themovie.anapp.R;
 import com.themovie.anapp.adapters.TabLayoutAdapter;
-import com.themovie.anapp.fragments.MovieFragment;
-import com.themovie.anapp.fragments.TvShowFragment;
 
-public class MainActivity extends AppCompatActivity implements MovieFragment.OnFragmentInteractionListener, TvShowFragment.OnFragmentInteractionListener {
-
-    private String getTabNumber;
+public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,16 +46,6 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.OnF
 
             }
         });
-    }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
-
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-
     }
 
     @Override
