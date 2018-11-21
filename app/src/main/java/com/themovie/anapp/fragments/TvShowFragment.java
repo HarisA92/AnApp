@@ -1,7 +1,6 @@
 package com.themovie.anapp.fragments;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -19,8 +18,8 @@ import com.themovie.anapp.activities.SearchActivity;
 import com.themovie.anapp.adapters.TvShowAdapter;
 import com.themovie.anapp.retrofit.ModelClient;
 import com.themovie.anapp.retrofit.RetrofitClient;
-import com.themovie.anapp.retrofit.model.modelTvShow.Result;
 import com.themovie.anapp.retrofit.model.modelTvShow.TopRatedTvShows;
+import com.themovie.anapp.retrofit.model.modelTvShow.TvShowResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +31,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class TvShowFragment extends Fragment {
 
-    private List<Result> list;
+    private List<TvShowResult> listTvShow;
     private RecyclerView recyclerView;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     private RetrofitClient client = ModelClient.retrofitclient();
@@ -59,6 +58,27 @@ public class TvShowFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    private void setUpTop10() {
+        compositeDisposable.add(client.getTvShows(BuildConfig.ApiKey, getResources().getString(R.string.language), 1)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(topRatedTvShows -> {
+                    listTvShow = topRatedTvShows.getResults();
+                    TvShowAdapter adapter = new TvShowAdapter(getActivity(), getTop10TvShow(listTvShow));
+                    recyclerView.setAdapter(adapter);
+                }, throwable -> Toast.makeText(getActivity(), getResources().getString(R.string.error) + throwable.getMessage(), Toast.LENGTH_SHORT).show()));
+    }
+
+    private List<TvShowResult> getTop10TvShow(List<TvShowResult> tvShowResults) {
+        List<TvShowResult> list = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            TvShowResult result = tvShowResults.get(i);
+            list.add(result);
+        }
+        return list;
+    }
+
+
     private void buildRecyclerView(View v) {
         recyclerView = v.findViewById(R.id.recycler_view_tvshows);
         recyclerView.setHasFixedSize(true);
@@ -66,27 +86,4 @@ public class TvShowFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
     }
 
-    private void setUpTop10() {
-        compositeDisposable.add(client.getTvShows(BuildConfig.ApiKey, getResources().getString(R.string.language), 1)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<TopRatedTvShows>() {
-                    @Override
-                    public void accept(TopRatedTvShows topRatedTvShows) throws Exception {
-                        list = topRatedTvShows.getResults();
-                        List<Result> exampleListFull = new ArrayList<>();
-                        for (int i = 0; i < 10; i++) {
-                            Result result = list.get(i);
-                            exampleListFull.add(result);
-                        }
-                        TvShowAdapter adapter = new TvShowAdapter(getActivity(), exampleListFull);
-                        recyclerView.setAdapter(adapter);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        Toast.makeText(getActivity(), getResources().getString(R.string.error) + throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }));
-    }
 }

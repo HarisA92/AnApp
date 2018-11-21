@@ -18,23 +18,21 @@ import com.themovie.anapp.adapters.MovieAdapter;
 import com.themovie.anapp.adapters.TvShowAdapter;
 import com.themovie.anapp.retrofit.ModelClient;
 import com.themovie.anapp.retrofit.RetrofitClient;
-import com.themovie.anapp.retrofit.model.modelMovie.Result;
-import com.themovie.anapp.retrofit.model.modelMovie.TopRatedMovies;
-import com.themovie.anapp.retrofit.model.modelTvShow.TopRatedTvShows;
+import com.themovie.anapp.retrofit.model.modelMovie.MovieResult;
+import com.themovie.anapp.retrofit.model.modelTvShow.TvShowResult;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 public class SearchActivity extends AppCompatActivity {
 
     private String getMovieTab, getTvShowTab;
-    private List<Result> listMovies;
-    private List<com.themovie.anapp.retrofit.model.modelTvShow.Result> listTvShow;
+    private List<MovieResult> listMovies;
+    private List<TvShowResult> listTvShow;
     private MovieAdapter movieAdapter;
     private TvShowAdapter tvShowAdapter;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
@@ -62,6 +60,7 @@ public class SearchActivity extends AppCompatActivity {
         inflater.inflate(R.menu.search_menu, menu);
 
         MenuItem searchItem = menu.findItem(R.id.action_search);
+        searchItem.expandActionView();
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
         searchView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
@@ -129,86 +128,62 @@ public class SearchActivity extends AppCompatActivity {
         compositeDisposable.add(client.getTvShows(BuildConfig.ApiKey, getResources().getString(R.string.language), 1)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<TopRatedTvShows>() {
-                    @Override
-                    public void accept(TopRatedTvShows topRatedTvShows) {
-                        listTvShow = topRatedTvShows.getResults();
-                        List<com.themovie.anapp.retrofit.model.modelTvShow.Result> exampleList = new ArrayList<>();
-                        for (int i = 0; i < 10; i++) {
-                            com.themovie.anapp.retrofit.model.modelTvShow.Result result = listTvShow.get(i);
-                            exampleList.add(result);
-                        }
-                        tvShowAdapter = new TvShowAdapter(getApplicationContext(), exampleList);
-                        recyclerView.setAdapter(tvShowAdapter);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) {
-                        Toast.makeText(SearchActivity.this, getResources().getString(R.string.error) + throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }));
+                .subscribe(topRatedTvShows -> {
+                    listTvShow = topRatedTvShows.getResults();
+                    tvShowAdapter = new TvShowAdapter(getApplicationContext(), getTop10TvShow(listTvShow));
+                    recyclerView.setAdapter(tvShowAdapter);
+                }, throwable -> Toast.makeText(SearchActivity.this, getResources().getString(R.string.error) + throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
     private void setUpTop10Movies() {
         compositeDisposable.add(client.getMovies(BuildConfig.ApiKey, getResources().getString(R.string.language), 1)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<TopRatedMovies>() {
-                    @Override
-                    public void accept(TopRatedMovies topRatedMovies) {
-                        listMovies = topRatedMovies.getResults();
-                        List<Result> exampleListFull = new ArrayList<>();
-                        for (int i = 0; i < 10; i++) {
-                            Result result = listMovies.get(i);
-                            exampleListFull.add(result);
-                        }
-                        movieAdapter = new MovieAdapter(getApplicationContext(), exampleListFull);
-                        recyclerView.setAdapter(movieAdapter);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) {
-                        Toast.makeText(SearchActivity.this, getResources().getString(R.string.error) + throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }));
+                .subscribe(topRatedMovies -> {
+                    listMovies = topRatedMovies.getResults();
+                    movieAdapter = new MovieAdapter(getApplicationContext(), getTop10Movies(listMovies));
+                    recyclerView.setAdapter(movieAdapter);
+                }, throwable -> Toast.makeText(SearchActivity.this, getResources().getString(R.string.error) + throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
     private void setUpSearchMovies(String getQuery) {
         compositeDisposable.add(client.getSearchedMovies(BuildConfig.ApiKey, getResources().getString(R.string.language), getQuery)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<TopRatedMovies>() {
-                    @Override
-                    public void accept(TopRatedMovies topRatedMovies) {
-                        listMovies = topRatedMovies.getResults();
-                        movieAdapter = new MovieAdapter(getApplicationContext(), listMovies);
-                        recyclerView.setAdapter(movieAdapter);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) {
-                        Toast.makeText(SearchActivity.this, getResources().getString(R.string.error) + throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }));
+                .subscribe(topRatedMovies -> {
+                    listMovies = topRatedMovies.getResults();
+                    movieAdapter = new MovieAdapter(getApplicationContext(), listMovies);
+                    recyclerView.setAdapter(movieAdapter);
+                }, throwable -> Toast.makeText(SearchActivity.this, getResources().getString(R.string.error) + throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
     private void setUpSearchTvShows(String getQuery) {
         compositeDisposable.add(client.getSearchedTvShows(BuildConfig.ApiKey, getResources().getString(R.string.language), getQuery)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<TopRatedTvShows>() {
-                    @Override
-                    public void accept(TopRatedTvShows topRatedTvShows) {
-                        listTvShow = topRatedTvShows.getResults();
-                        tvShowAdapter = new TvShowAdapter(getApplicationContext(), listTvShow);
-                        recyclerView.setAdapter(tvShowAdapter);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) {
-                        Toast.makeText(SearchActivity.this, getResources().getString(R.string.error) + throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }));
+                .subscribe(topRatedTvShows -> {
+                    listTvShow = topRatedTvShows.getResults();
+                    tvShowAdapter = new TvShowAdapter(getApplicationContext(), listTvShow);
+                    recyclerView.setAdapter(tvShowAdapter);
+                }, throwable -> Toast.makeText(SearchActivity.this, getResources().getString(R.string.error) + throwable.getMessage(), Toast.LENGTH_SHORT).show()));
+    }
+
+    private List<MovieResult> getTop10Movies(List<MovieResult> movieResults) {
+        List<MovieResult> list = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            MovieResult result = movieResults.get(i);
+            list.add(result);
+        }
+        return list;
+    }
+
+    private List<TvShowResult> getTop10TvShow(List<TvShowResult> tvShowResults) {
+        List<TvShowResult> list = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            TvShowResult result = tvShowResults.get(i);
+            list.add(result);
+        }
+        return list;
     }
 
     private void setUpRecyclerView() {

@@ -14,16 +14,16 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.themovie.anapp.R;
 import com.themovie.anapp.activities.HolderActivity;
-import com.themovie.anapp.retrofit.model.modelMovie.Result;
+import com.themovie.anapp.retrofit.model.modelMovie.MovieResult;
 
 import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
 
     private Context context;
-    private List<Result> list;
+    private List<MovieResult> list;
 
-    public MovieAdapter(Context context, List<Result> list) {
+    public MovieAdapter(Context context, List<MovieResult> list) {
         this.context = context;
         this.list = list;
     }
@@ -37,20 +37,17 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        final Result movieList = list.get(position);
+        final MovieResult movieList = list.get(position);
         Glide.with(context).load(context.getResources().getString(R.string.imagePath) + movieList.getPosterPath())
                 .apply(RequestOptions.circleCropTransform())
                 .into(holder.image);
         holder.title.setText(movieList.getTitle());
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(), HolderActivity.class);
-                intent.putExtra(context.getResources().getString(R.string.title), movieList.getTitle());
-                intent.putExtra(context.getResources().getString(R.string.overview), movieList.getOverview());
-                intent.putExtra(context.getResources().getString(R.string.backdropPath), movieList.getBackdropPath());
-                view.getContext().startActivity(intent);
-            }
+        holder.itemView.setOnClickListener(view -> {
+            Intent intent = new Intent(view.getContext(), HolderActivity.class);
+            intent.putExtra(context.getResources().getString(R.string.title), movieList.getTitle());
+            intent.putExtra(context.getResources().getString(R.string.overview), movieList.getOverview());
+            intent.putExtra(context.getResources().getString(R.string.backdropPath), movieList.getBackdropPath());
+            view.getContext().startActivity(intent);
         });
     }
 

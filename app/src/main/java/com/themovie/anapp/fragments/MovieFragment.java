@@ -18,7 +18,7 @@ import com.themovie.anapp.activities.SearchActivity;
 import com.themovie.anapp.adapters.MovieAdapter;
 import com.themovie.anapp.retrofit.ModelClient;
 import com.themovie.anapp.retrofit.RetrofitClient;
-import com.themovie.anapp.retrofit.model.modelMovie.Result;
+import com.themovie.anapp.retrofit.model.modelMovie.MovieResult;
 import com.themovie.anapp.retrofit.model.modelMovie.TopRatedMovies;
 
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class MovieFragment extends Fragment {
 
-    private List<Result> list;
+    private List<MovieResult> listMovie;
     private RecyclerView recyclerView;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     private RetrofitClient client = ModelClient.retrofitclient();
@@ -62,25 +62,22 @@ public class MovieFragment extends Fragment {
         compositeDisposable.add(client.getMovies(BuildConfig.ApiKey, getResources().getString(R.string.language), 1)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<TopRatedMovies>() {
-                    @Override
-                    public void accept(TopRatedMovies topRatedMovies) {
-                        list = topRatedMovies.getResults();
-                        List<Result> exampleListFull = new ArrayList<>();
-                        for (int i = 0; i < 10; i++) {
-                            Result result = list.get(i);
-                            exampleListFull.add(result);
-                        }
-                        MovieAdapter adapter = new MovieAdapter(getActivity(), exampleListFull);
-                        recyclerView.setAdapter(adapter);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) {
-                        Toast.makeText(getActivity(), getResources().getString(R.string.error) + throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }));
+                .subscribe(topRatedMovies -> {
+                    listMovie = topRatedMovies.getResults();
+                    MovieAdapter adapter = new MovieAdapter(getActivity(), getTop10Movies(listMovie));
+                    recyclerView.setAdapter(adapter);
+                }, throwable -> Toast.makeText(getActivity(), getResources().getString(R.string.error) + throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
+
+    private List<MovieResult> getTop10Movies(List<MovieResult> movieResults) {
+        List<MovieResult> list = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            MovieResult result = movieResults.get(i);
+            list.add(result);
+        }
+        return list;
+    }
+
 
     private void buildRecyclerView(View v) {
         recyclerView = v.findViewById(R.id.recycler_view_movies);

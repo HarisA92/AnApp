@@ -22,6 +22,10 @@ android {
             resValue 'string', "api_key", themoviedb_api
         }
     }
+    compileOptions {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
 }
 
 dependencies {
@@ -42,12 +46,8 @@ dependencies {
 
     implementation 'com.github.bumptech.glide:glide:4.8.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
-
-    implementation 'com.squareup.picasso:picasso:2.71828'
-    implementation 'jp.wasabeef:picasso-transformations:2.2.1'
-
+    
     implementation "io.reactivex.rxjava2:rxjava:2.2.3"
     implementation "io.reactivex.rxjava2:rxandroid:2.0.1"
-
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
 }
