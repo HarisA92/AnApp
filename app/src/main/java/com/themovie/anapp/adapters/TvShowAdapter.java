@@ -23,20 +23,20 @@ public class TvShowAdapter extends RecyclerView.Adapter<TvShowAdapter.ViewHolder
     private List<TvShowResult> list;
     private Context context;
 
-    public TvShowAdapter(Context context, List<TvShowResult> list) {
+    public TvShowAdapter(List<TvShowResult> list) {
         this.list = list;
-        this.context = context;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View v = LayoutInflater.from(context).inflate(R.layout.movies_tvshows_adapter, viewGroup, false);
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.movies_tvshows_adapter, viewGroup, false);
         return new TvShowAdapter.ViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        context = holder.itemView.getContext();
         final TvShowResult result = list.get(position);
         holder.title.setText(result.getName());
         Glide.with(context).load(context.getResources().getString(R.string.imagePath) + result.getPosterPath())

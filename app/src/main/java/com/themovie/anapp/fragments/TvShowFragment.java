@@ -18,7 +18,6 @@ import com.themovie.anapp.activities.SearchActivity;
 import com.themovie.anapp.adapters.TvShowAdapter;
 import com.themovie.anapp.retrofit.ModelClient;
 import com.themovie.anapp.retrofit.RetrofitClient;
-import com.themovie.anapp.retrofit.model.modelTvShow.TopRatedTvShows;
 import com.themovie.anapp.retrofit.model.modelTvShow.TvShowResult;
 
 import java.util.ArrayList;
@@ -26,7 +25,6 @@ import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 public class TvShowFragment extends Fragment {
@@ -58,13 +56,28 @@ public class TvShowFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        recyclerView.setAdapter(null);
+        recyclerView.setLayoutManager(null);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (compositeDisposable != null && !compositeDisposable.isDisposed()) {
+            compositeDisposable.dispose();
+        }
+    }
+
     private void setUpTop10() {
         compositeDisposable.add(client.getTvShows(BuildConfig.ApiKey, getResources().getString(R.string.language), 1)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(topRatedTvShows -> {
                     listTvShow = topRatedTvShows.getResults();
-                    TvShowAdapter adapter = new TvShowAdapter(getActivity(), getTop10TvShow(listTvShow));
+                    TvShowAdapter adapter = new TvShowAdapter(getTop10TvShow(listTvShow));
                     recyclerView.setAdapter(adapter);
                 }, throwable -> Toast.makeText(getActivity(), getResources().getString(R.string.error) + throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
@@ -77,7 +90,6 @@ public class TvShowFragment extends Fragment {
         }
         return list;
     }
-
 
     private void buildRecyclerView(View v) {
         recyclerView = v.findViewById(R.id.recycler_view_tvshows);

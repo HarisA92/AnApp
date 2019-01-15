@@ -23,20 +23,20 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     private Context context;
     private List<MovieResult> list;
 
-    public MovieAdapter(Context context, List<MovieResult> list) {
-        this.context = context;
+    public MovieAdapter(List<MovieResult> list) {
         this.list = list;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View v = LayoutInflater.from(context).inflate(R.layout.movies_tvshows_adapter, viewGroup, false);
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.movies_tvshows_adapter, viewGroup, false);
         return new ViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        context = holder.itemView.getContext();
         final MovieResult movieList = list.get(position);
         Glide.with(context).load(context.getResources().getString(R.string.imagePath) + movieList.getPosterPath())
                 .apply(RequestOptions.circleCropTransform())

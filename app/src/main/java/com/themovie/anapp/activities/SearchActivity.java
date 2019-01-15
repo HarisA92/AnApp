@@ -35,15 +35,18 @@ public class SearchActivity extends AppCompatActivity {
     private List<TvShowResult> listTvShow;
     private MovieAdapter movieAdapter;
     private TvShowAdapter tvShowAdapter;
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private CompositeDisposable compositeDisposable;
     private RecyclerView recyclerView;
-    private RetrofitClient client = ModelClient.retrofitclient();
+    private RetrofitClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         setUpRecyclerView();
+
+        compositeDisposable = new CompositeDisposable();
+        client = ModelClient.retrofitclient();
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -119,6 +122,8 @@ public class SearchActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        recyclerView.setAdapter(null);
+        recyclerView.setLayoutManager(null);
         if (compositeDisposable != null && !compositeDisposable.isDisposed()) {
             compositeDisposable.dispose();
         }
@@ -130,7 +135,7 @@ public class SearchActivity extends AppCompatActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(topRatedTvShows -> {
                     listTvShow = topRatedTvShows.getResults();
-                    tvShowAdapter = new TvShowAdapter(getApplicationContext(), getTop10TvShow(listTvShow));
+                    tvShowAdapter = new TvShowAdapter(getTop10TvShow(listTvShow));
                     recyclerView.setAdapter(tvShowAdapter);
                 }, throwable -> Toast.makeText(SearchActivity.this, getResources().getString(R.string.error) + throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
@@ -141,7 +146,7 @@ public class SearchActivity extends AppCompatActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(topRatedMovies -> {
                     listMovies = topRatedMovies.getResults();
-                    movieAdapter = new MovieAdapter(getApplicationContext(), getTop10Movies(listMovies));
+                    movieAdapter = new MovieAdapter(getTop10Movies(listMovies));
                     recyclerView.setAdapter(movieAdapter);
                 }, throwable -> Toast.makeText(SearchActivity.this, getResources().getString(R.string.error) + throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
@@ -152,7 +157,7 @@ public class SearchActivity extends AppCompatActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(topRatedMovies -> {
                     listMovies = topRatedMovies.getResults();
-                    movieAdapter = new MovieAdapter(getApplicationContext(), listMovies);
+                    movieAdapter = new MovieAdapter(listMovies);
                     recyclerView.setAdapter(movieAdapter);
                 }, throwable -> Toast.makeText(SearchActivity.this, getResources().getString(R.string.error) + throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
@@ -163,7 +168,7 @@ public class SearchActivity extends AppCompatActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(topRatedTvShows -> {
                     listTvShow = topRatedTvShows.getResults();
-                    tvShowAdapter = new TvShowAdapter(getApplicationContext(), listTvShow);
+                    tvShowAdapter = new TvShowAdapter(listTvShow);
                     recyclerView.setAdapter(tvShowAdapter);
                 }, throwable -> Toast.makeText(SearchActivity.this, getResources().getString(R.string.error) + throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
