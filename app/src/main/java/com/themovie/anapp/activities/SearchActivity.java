@@ -17,6 +17,7 @@ import com.themovie.anapp.R;
 import com.themovie.anapp.adapters.MovieAdapter;
 import com.themovie.anapp.adapters.TvShowAdapter;
 import com.themovie.anapp.retrofit.ModelClient;
+import com.themovie.anapp.retrofit.RestClient;
 import com.themovie.anapp.retrofit.RetrofitClient;
 import com.themovie.anapp.retrofit.model.modelMovie.MovieResult;
 import com.themovie.anapp.retrofit.model.modelTvShow.TvShowResult;
@@ -38,6 +39,7 @@ public class SearchActivity extends AppCompatActivity {
     private CompositeDisposable compositeDisposable;
     private RecyclerView recyclerView;
     private RetrofitClient client;
+    private RestClient restClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,7 @@ public class SearchActivity extends AppCompatActivity {
 
         compositeDisposable = new CompositeDisposable();
         client = ModelClient.retrofitclient();
+        restClient = new RestClient();
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -130,7 +133,7 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void setUpTop10TvShows() {
-        compositeDisposable.add(client.getTvShows(BuildConfig.ApiKey, getResources().getString(R.string.language), 1)
+        compositeDisposable.add(restClient.getTopRatedTvShows()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(topRatedTvShows -> {
@@ -141,7 +144,7 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void setUpTop10Movies() {
-        compositeDisposable.add(client.getMovies(BuildConfig.ApiKey, getResources().getString(R.string.language), 1)
+        compositeDisposable.add(restClient.getTopRatedMovies()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(topRatedMovies -> {
@@ -152,7 +155,7 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void setUpSearchMovies(String getQuery) {
-        compositeDisposable.add(client.getSearchedMovies(BuildConfig.ApiKey, getResources().getString(R.string.language), getQuery)
+        compositeDisposable.add(restClient.searchMovies(getQuery)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(topRatedMovies -> {
@@ -163,7 +166,7 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void setUpSearchTvShows(String getQuery) {
-        compositeDisposable.add(client.getSearchedTvShows(BuildConfig.ApiKey, getResources().getString(R.string.language), getQuery)
+        compositeDisposable.add(restClient.searchTvShows(getQuery)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(topRatedTvShows -> {

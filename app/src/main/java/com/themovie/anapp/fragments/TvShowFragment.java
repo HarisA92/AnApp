@@ -3,6 +3,7 @@ package com.themovie.anapp.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +18,7 @@ import com.themovie.anapp.R;
 import com.themovie.anapp.activities.SearchActivity;
 import com.themovie.anapp.adapters.TvShowAdapter;
 import com.themovie.anapp.retrofit.ModelClient;
+import com.themovie.anapp.retrofit.RestClient;
 import com.themovie.anapp.retrofit.RetrofitClient;
 import com.themovie.anapp.retrofit.model.modelTvShow.TvShowResult;
 
@@ -31,8 +33,17 @@ public class TvShowFragment extends Fragment {
 
     private List<TvShowResult> listTvShow;
     private RecyclerView recyclerView;
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
-    private RetrofitClient client = ModelClient.retrofitclient();
+    private CompositeDisposable compositeDisposable;
+    private RetrofitClient client;
+    private RestClient restClient;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        compositeDisposable = new CompositeDisposable();
+        client = ModelClient.retrofitclient();
+        restClient = new RestClient();
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -72,7 +83,7 @@ public class TvShowFragment extends Fragment {
     }
 
     private void setUpTop10() {
-        compositeDisposable.add(client.getTvShows(BuildConfig.ApiKey, getResources().getString(R.string.language), 1)
+        compositeDisposable.add(restClient.getTopRatedTvShows()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(topRatedTvShows -> {

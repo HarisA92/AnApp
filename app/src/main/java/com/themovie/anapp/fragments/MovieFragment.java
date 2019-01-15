@@ -18,6 +18,7 @@ import com.themovie.anapp.R;
 import com.themovie.anapp.activities.SearchActivity;
 import com.themovie.anapp.adapters.MovieAdapter;
 import com.themovie.anapp.retrofit.ModelClient;
+import com.themovie.anapp.retrofit.RestClient;
 import com.themovie.anapp.retrofit.RetrofitClient;
 import com.themovie.anapp.retrofit.model.modelMovie.MovieResult;
 
@@ -34,12 +35,14 @@ public class MovieFragment extends Fragment {
     private RecyclerView recyclerView;
     private CompositeDisposable compositeDisposable;
     private RetrofitClient client;
+    private RestClient restClient;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         compositeDisposable = new CompositeDisposable();
         client = ModelClient.retrofitclient();
+        restClient = new RestClient();
     }
 
     @Override
@@ -80,7 +83,7 @@ public class MovieFragment extends Fragment {
     }
 
     private void setUpTop10() {
-        compositeDisposable.add(client.getMovies(BuildConfig.ApiKey, getResources().getString(R.string.language), 1)
+        compositeDisposable.add(restClient.getTopRatedMovies()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(topRatedMovies -> {
